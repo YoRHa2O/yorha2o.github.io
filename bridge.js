@@ -2,8 +2,19 @@
 (() => {
   const home = new URL('https://yorha2o-gamedesign.pages.dev/GameDesign/');
   const old = new URL(location.href);
-  const message = document.querySelector('p');
-  const link = document.querySelector('a');
+  function updateEntry(href, message, label) {
+    function render() {
+      const link = document.querySelector('main a');
+      link.href = href;
+      link.textContent = label;
+      document.querySelector('main p').textContent = message;
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', render, {once: true});
+    } else {
+      render();
+    }
+  }
   const pages = new Set([
     'index', 'game-wall', 'once-human', 'portal', 'security', 'text-game', 'workflow',
     'archive', 'ai-workflow', 'ue-review', 'visitor-login'
@@ -16,9 +27,7 @@
   if (callbacks.test(old.pathname) || authParameters(old.searchParams) ||
       authParameters(new URLSearchParams(old.hash.slice(1)))) {
     history.replaceState(null, '', old.pathname);
-    message.textContent = '旧站登录已结束。请从新站首页重新进入。';
-    link.href = home.href;
-    link.textContent = '打开新站首页';
+    updateEntry(home.href, '旧站登录已结束。请从新站首页重新进入。', '打开新站首页');
     return;
   }
   if (window.top !== window.self) return;
@@ -53,7 +62,6 @@
       (video && /^#t=\d+(?:\.\d+)?(?:,\d+(?:\.\d+)?)?$/.test(old.hash))) {
     destination.hash = old.hash;
   }
-  link.href = destination.href;
-  message.textContent = '正在打开游戏设计笔记的新地址…';
+  updateEntry(destination.href, '若页面尚未跳转，可从下方进入。', '前往新站对应页面');
   location.replace(destination.href);
 })();
